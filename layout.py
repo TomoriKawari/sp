@@ -1,180 +1,225 @@
-from importlib.metadata import PathDistribution
-from tkinter import *
+from dataclasses import dataclass
+from logging import root
+from tkinter import*
+from tkinter import font
+from tkinter import ttk
 from turtle import width
 
-# Imp 
-root = Tk()
-frame = Frame(root,width=700, height=700, bg="powder blue").place(x=5,y=8)
-root.geometry("1550x800+0+0")
-root.config(bg="powder blue")
-#
+from numpy import pad
+from pyparsing import col
 
-# Frame Box
-secondFrame = Frame(root, bd=10, relief=RIDGE, padx=20, bg="powder blue")
-secondFrame.place(x=0, y=65, width=1535.5, height=400)
-#
 
-# Headline
-headlineLabel = Label(frame, text="LIBRARY MANAGEMENT SYSTEM",font=('Arial',20,"bold"), bg="powder blue", bd=10, relief=RIDGE, fg="green", padx=2, pady=6)
-headlineLabel.pack(side=TOP, fill=X)
-#
-# Label
-libraryMembershipInfoLabel = Label(secondFrame, text="Library Membership Information", bg="powder blue", font=('Arial',10))
-libraryMembershipInfoLabel.place(x=10, y=8)
-#
-# MemberType
-memberTypeLabel = Label(secondFrame, text="Member Type", bg="powder blue", font=("Arial",10))
-memberTypeLabel.place(x=25, y=40)
-#
-# PRN No
-prnNoLabel = Label(secondFrame, text="PRN No:", bg="powder blue", font=('Arial',10))
-prnNoLabel.place(x=25, y=72)
-prnNoEntry = Entry(secondFrame)
-prnNoEntry.place(x=130, y=72, width=220)
-#
-# ID No
-idNoLabel = Label(secondFrame, text="ID No:", bg="powder blue", font=('Arial',10))
-idNoLabel.place(x=25, y=104)
-idNoEntry = Entry(secondFrame)
-idNoEntry.place(x=130, y=104, width=220)
-#
-# First Name
-firstNameLabel = Label(secondFrame, text="First Name:", bg="powder blue", font=('Arial',10))
-firstNameLabel.place(x=25, y=136)
-firstNameEntry = Entry(secondFrame)
-firstNameEntry.place(x=130, y=136, width=220)
-#
-# Surname
-surNameLabel = Label(secondFrame, text="Sur Name:", bg="powder blue", font=('Arial',10))
-surNameLabel.place(x=25, y=168)
-surNameEntry = Entry(secondFrame)
-surNameEntry.place(x=130, y=168, width=220)
-#
-# Address 1
-address1Label = Label(secondFrame, text="Adress 1:", bg="powder blue", font=('Arial',10))
-address1Label.place(x=25, y=200)
-address1Entry = Entry(secondFrame)
-address1Entry.place(x=130, y=200, width=220)
-#
-# Address 2
-address2Label = Label(secondFrame, text="Adress 2:", bg="powder blue", font=('Arial',10))
-address2Label.place(x=25, y=232)
-address2Entry = Entry(secondFrame)
-address2Entry.place(x=130, y=232, width=220)
-#
-# Post Code
-postCodeLabel = Label(secondFrame, text="Post Code:", bg="powder blue", font=('Arial',10))
-postCodeLabel.place(x=25, y=264)
-postCodeEntry = Entry(secondFrame)
-postCodeEntry.place(x=130, y=264, width=220)
-#
-# Mobile Number
-mobileNumberLabel = Label(secondFrame, text="Mobile Number:", bg="powder blue", font=('Arial',10))
-mobileNumberLabel.place(x=25, y=296)
-mobileNumberEntry = Entry(secondFrame)
-mobileNumberEntry.place(x=130, y=296, width=220)
-#
-# Book ID
-bookIDLabel = Label(secondFrame, text="Book ID:", bg="powder blue", font=('Arial', 10))
-bookIDLabel.place(x=380, y=40)
-bookIDEntry = Entry(secondFrame)
-bookIDEntry.place(x=485, y=40, width=220)
-#
-# Book Title
-bookTitleLabel = Label(secondFrame, text="Book Title:", bg="powder blue", font=('Arial', 10))
-bookTitleLabel.place(x=380, y=72)
-bookTitleEntry = Entry(secondFrame)
-bookTitleEntry.place(x=485, y=72, width=220)
-#
-# Author Name
-authorNameLabel = Label(secondFrame, text="Author Name:", bg="powder blue", font=('Arial', 10),)
-authorNameLabel.place(x=380, y=104)
-authorNameEntry = Entry(secondFrame)
-authorNameEntry.place(x=485, y=104, width=220)
-#
-# Date Borrowed
-dateBorrowedLabel = Label(secondFrame, text="Date Borrowed:", bg="powder blue", font=('Arial', 10))
-dateBorrowedLabel.place(x=380, y=136)
-dateBorrowedEntry = Entry(secondFrame)
-dateBorrowedEntry.place(x=485, y=136, width=220)
-#
-# Date Due
-dateDueLabel = Label(secondFrame, text="Date Due:", bg="powder blue", font=('Arial', 10))
-dateDueLabel.place(x=380, y=168)
-dateDueEntry = Entry(secondFrame)
-dateDueEntry.place(x=485, y=168, width=220)
-#
-# Days Borrowed
-daysBorrowedLabel = Label(secondFrame, text="Date Borrowed:", bg="powder blue", font=('Arial', 10))
-daysBorrowedLabel.place(x=380, y=200)
-daysBorrowedEntry = Entry(secondFrame)
-daysBorrowedEntry.place(x=485, y=200, width=220)
-#
-# Late Return Fee
-LateReturnFeeLabel = Label(secondFrame, text="Date Due:", bg="powder blue", font=('Arial', 10))
-LateReturnFeeLabel.place(x=380, y=232)
-LateReturnFeeEntry = Entry(secondFrame)
-LateReturnFeeEntry.place(x=485, y=232, width=220)
-#
-# Date Overdue
-dateOverdueLabel = Label(secondFrame, text="Date Overdue:", bg="powder blue", font=('Arial', 10))
-dateOverdueLabel.place(x=380, y=264)
-dateOverdueEntry = Entry(secondFrame)
-dateOverdueEntry.place(x=485, y=264, width=220)
-#
-# Total Price
-totalPriceLabel = Label(secondFrame, text="Total Price:", bg="powder blue", font=('Arial', 10))
-totalPriceLabel.place(x=380, y=296)
-totalPriceEntry = Entry(secondFrame)
-totalPriceEntry.place(x=485, y=296, width=220)
-#
 
-# Book Details Label
-bookDetailsLabel = Label(secondFrame, text="Book Details", bg="powder blue", font=('Arial', 10))
-bookDetailsLabel.place(x=850, y=8)
-#
-# Book Details Scrollbar
-bookDetailsScrollbar = Scrollbar(secondFrame)
-bookDetailsScrollbar.place(x=865, y=40, width=500, height=278)
-#
+class LibraryManagementSystem:
+    def __init__(self, root):
+        self.root = root
+        self.root.title('Library Management System')
+        self.root.geometry('1550x800+0+0')
 
-# Third Frame
-thirdFrame = Frame(root, bd=10, relief=RIDGE, padx=20, bg="powder blue")
-thirdFrame.place(x=0, y=465, width=1535.5, height=80)
-#
+        lbltitle = Label(self.root, text='LIBRARY MANAGEMENT SYSTEM', bg='powder blue', fg='green', bd=20, relief=RIDGE, font=('arial', 50, 'bold'), padx=2, pady=6)
+        lbltitle.pack(side=TOP, fill=X)
 
-# Add Data Button
-addDataButton = Button(thirdFrame, text="ADD DATA", activebackground="red", font=('Arial', 12))
-addDataButton.place(x=0, y=0, width=250, height=59)
-#
-# Show Data Button
-showDataButton = Button(thirdFrame, text="ADD DATA", activebackground="red", font=('Arial', 12))
-showDataButton.place(x=250, y=0, width=250, height=59)
-#
-# Update Button
-updateButton = Button(thirdFrame, text="UPDATE", activebackground="red", font=('Arial', 12))
-updateButton.place(x=500, y=0, width=250, height=59)
-#
-# Delete Butotn
-deleteButton = Button(thirdFrame, text="DELETE", activebackground="red", font=('Arial', 12))
-deleteButton.place(x=750, y=0, width=250, height=59)
-#
-# Reset Button
-resetButton = Button(thirdFrame, text="RESET", activebackground="red", font=('Arial', 12))
-resetButton.place(x=1000, y=0, width=250, height=59)
-#
-# Exit Button
-exitButton = Button(thirdFrame, text="EXIT", activebackground="red", font=('Arial', 12))
-exitButton.place(x=1250, y=0, width=240, height=59)
-#
+        frame = Frame(self.root, bd=12, relief=RIDGE, padx=20, bg='powder blue')
+        frame.place(x=0, y=130, width=1530, height=400)
 
-# Fourth Frame
-fourthFrame = Frame(root, bd=10, relief=RIDGE, padx=20, bg="powder blue")
-fourthFrame.place(x=0, y=545, width=1535.5, height=295)
-#
 
-# Customer Details Scrollbar
-customerScrollbar = Scrollbar(fourthFrame)
-customerScrollbar.place(x=0, y=10, width=1480, height=250)
-#
-root.mainloop()
+        # =========================== DATA FRAME LEFT =========================== #
+
+        DataFrameLeft = LabelFrame(frame, text= 'Library Membership Information', bg='powder blue', fg='green', bd=12, relief=RIDGE, font=('arial', 12, 'bold'))
+        DataFrameLeft.place(x=0, y=5, width=900, height=350)
+
+        lblMembr = Label(DataFrameLeft, bg='powder blue', text='Member Type', font=('arial', 12, 'bold'), padx=2, pady=6)
+        lblMembr.grid(row=0, column=0, sticky=W)
+
+        comMember = ttk.Combobox(DataFrameLeft, font=('arial', 12, 'bold'), width=27, state='readonly')
+        comMember['value'] = ('Admin Staff', 'Student', 'Lecturer')
+        comMember.current(0)
+        comMember.grid(row=0, column=1)
+
+        lblPRN_No = Label(DataFrameLeft, bg='powder blue', text='PRN No', font=('arial', 12, 'bold'), padx=2, pady=4)
+        lblPRN_No.grid(row=1, column=0, sticky=W)
+        txtPRN_No = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtPRN_No.grid(row=1, column=1)
+
+        lblTitle = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='ID No:', padx=2, pady=4, bg='powder blue')
+        lblTitle.grid(row=2, column=0, sticky=W)
+        txtTitle = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtTitle.grid(row=2, column=1)
+
+        lblFirstName = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='FirstName:', padx=2, pady=6, bg='powder blue')
+        lblFirstName.grid(row=3, column=0, sticky=W)
+        txtFirstName = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtFirstName.grid(row=3, column=1)
+
+        lblLastName = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='LastName:', padx=2, pady=6, bg='powder blue')
+        lblLastName.grid(row=4, column=0, sticky=W)
+        txtLastName = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtLastName.grid(row=4, column=1)
+
+        lblAddress1 = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Address1:', padx=2, pady=6, bg='powder blue')
+        lblAddress1.grid(row=5, column=0, sticky=W)
+        txtAddress1 = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtAddress1.grid(row=5, column=1)
+
+        lblAddress2 = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Address2:', padx=2, pady=6, bg='powder blue')
+        lblAddress2.grid(row=6, column=0, sticky=W)
+        txtAddress2 = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtAddress2.grid(row=6, column=1)
+
+        lblPostCode = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Post Code:', padx=2, pady=4, bg='powder blue')
+        lblPostCode.grid(row=7, column=0, sticky=W)
+        txtPostCode = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtPostCode.grid(row=7, column=1)
+
+        lblMobile = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Mobile:', padx=2, pady=6, bg='powder blue')
+        lblMobile.grid(row=8, column=0, sticky=W)
+        txtMobile = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtMobile.grid(row=8, column=1)
+
+        lblBookId = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Book Id:', padx=2, pady=6, bg='powder blue')
+        lblBookId.grid(row=0, column=2, sticky=W)
+        txtBookId = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtBookId.grid(row=0, column=3)
+
+        lblBookTitle = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Book Title:', padx=2, pady=6, bg='powder blue')
+        lblBookTitle.grid(row=1, column=2, sticky=W)
+        txtBookTitle = Entry(DataFrameLeft, font=('arial', 13, 'bold'), width=29)
+        txtBookTitle.grid(row=1, column=3)
+
+        lblAuthor = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Author Name:', padx=2, pady=6, bg='powder blue')
+        lblAuthor.grid(row=2, column=2, sticky=W)
+        txtAuthor = Entry(DataFrameLeft, font=('arial', 12, 'bold'), width=29)
+        txtAuthor.grid(row=2, column=3)
+
+        lblDateBorrowed = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Date Borrowed:', padx=2, pady=6, bg='powder blue')
+        lblDateBorrowed.grid(row=3, column=2, sticky=W)
+        txtDateBorrowed = Entry(DataFrameLeft, font=('arial', 12, 'bold'), width=29)
+        txtDateBorrowed.grid(row=3, column=3)
+
+        lblDateDue = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Date Due:', padx=2, pady=6, bg='powder blue')
+        lblDateDue.grid(row=4, column=2, sticky=W)
+        txtDateDue = Entry(DataFrameLeft, font=('arial', 12, 'bold'), width=29)
+        txtDateDue.grid(row=4, column=3)
+
+        lblDaysOnBook = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Days On Book:', padx=2, pady=6, bg='powder blue')
+        lblDaysOnBook.grid(row=5, column=2, sticky=W)
+        txtDaysOnBook = Entry(DataFrameLeft, font=('arial', 12, 'bold'), width=29)
+        txtDaysOnBook.grid(row=5, column=3)
+
+        lblLateReturnFine = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Late Return Fine:', padx=2, pady=6, bg='powder blue')
+        lblLateReturnFine.grid(row=6, column=2, sticky=W)
+        txtLateReturnFine = Entry(DataFrameLeft, font=('arial', 12, 'bold'), width=29)
+        txtLateReturnFine.grid(row=6, column=3)
+
+
+        # =========================== MISSPELL, OVERDATE SHOULD BE OVERDUE =========================== #
+        lblDateOverdate = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Date Overdue:', padx=2, pady=6, bg='powder blue')
+        lblDateOverdate.grid(row=7, column=2, sticky=W)
+        txtDateOverdate = Entry(DataFrameLeft, font=('arial', 12, 'bold'), width=29)
+        txtDateOverdate.grid(row=7, column=3)
+
+        lblActualPrice = Label(DataFrameLeft, font=('arial', 12, 'bold'), text='Actual Price:', padx=2, pady=6, bg='powder blue')
+        lblActualPrice.grid(row=8, column=2, sticky=W)
+        txtActualPrice = Entry(DataFrameLeft, font=('arial', 12, 'bold'), width=29)
+        txtActualPrice.grid(row=8, column=3)
+
+        # =========================== DATA FRAME RIGHT =========================== #
+
+        DataFrameRight = LabelFrame(frame, text= 'Book Details', bg='powder blue', fg='green', bd=12, relief=RIDGE, font=('arial', 12, 'bold'))
+        DataFrameRight.place(x=910, y=5, width=540, height=350)
+
+        self.txtBox = Text(DataFrameRight, font=('arial', 12, 'bold'), width=32, height=16, padx=2, pady=6)
+        self.txtBox.grid(row=0, column=2)
+        
+        
+        # =========================== SELF INSERT LIST =========================== #
+
+        listScrollbar = Scrollbar(DataFrameRight)
+        listScrollbar.grid(row=0, column=1, sticky='ns')
+
+        listBooks = []
+        listBox = Listbox(DataFrameRight, font=('Arial', 12, 'bold'), width=20, height=16)
+        listBox.grid(row=0, column=0, padx=4)
+        listScrollbar.config(command=listBox.yview)
+
+        for item in listBooks:
+            listBox.insert(END, item)
+
+
+        # =========================== BUTTONS FRAME =========================== #
+
+        FrameButton = Frame(self.root, bd=12, relief=RIDGE, padx=20, bg='powder blue')
+        FrameButton.place(x=0, y=530, width=1530, height=60)
+
+        btnAddData = Button(FrameButton, text='Add Data', font=('Arial', 12, 'bold'), width=23, bg='blue', fg='white')
+        btnAddData.grid(row=0, column=0)
+
+        btnAddData = Button(FrameButton, text='Show Data', font=('Arial', 12, 'bold'), width=23, bg='blue', fg='white')
+        btnAddData.grid(row=0, column=1)
+
+        btnAddData = Button(FrameButton, text='Update', font=('Arial', 12, 'bold'), width=23, bg='blue', fg='white')
+        btnAddData.grid(row=0, column=2)
+
+        btnAddData = Button(FrameButton, text='Delete', font=('Arial', 12, 'bold'), width=23, bg='blue', fg='white')
+        btnAddData.grid(row=0, column=3)
+
+        btnAddData = Button(FrameButton, text='Reset', font=('Arial', 12, 'bold'), width=23, bg='blue', fg='white')
+        btnAddData.grid(row=0, column=4)
+
+        btnAddData = Button(FrameButton, text='Exit', font=('Arial', 12, 'bold'), width=23, bg='blue', fg='white')
+        btnAddData.grid(row=0, column=5)
+
+
+        # =========================== INFO FRAME =========================== #
+
+        FrameDetails = Frame(self.root, bd=12, relief=RIDGE, padx=20, bg='powder blue')
+        FrameDetails.place(x=0, y=590, width=1530, height=210)
+
+        Table_frame = Frame(FrameDetails, bd=6, relief=RIDGE, bg='powder blue')
+        Table_frame.place(x=0, y=2, width=1460, height=190)
+
+        xscroll = ttk.Scrollbar(Table_frame, orient=HORIZONTAL)
+        yscroll = ttk.Scrollbar(Table_frame, orient=VERTICAL)
+
+        self.library_table=ttk.Treeview(Table_frame, columns=('membertype', 'prnno', 'title', 'firstname', 'lastname', 'address1', 'address2', 'postid', 'mobile', 'bookid',
+                                            'booktitle', 'author', 'dateborrowed', 'datedue', 'days', 'latereturnfine', 'dateoverdue', 'finalprice'), xscrollcommand=xscroll.set, yscrollcommand=yscroll.set)
+        
+        xscroll.pack(side=BOTTOM, fill=X)
+        yscroll.pack(side=RIGHT, fill=Y)
+
+        xscroll.config(command=self.library_table.xview)
+        yscroll.config(command=self.library_table.yview)
+
+        self.library_table.heading('membertype', text='Member Type')
+        self.library_table.heading('prnno', text='Reference No.')
+        self.library_table.heading('tile', text='Title')
+        self.library_table.heading('firstname', text='First Name')
+        self.library_table.heading('lastname', text='Last Name')
+        self.library_table.heading('address1', text='Address1')
+        self.library_table.heading('address2', text='Address2')
+        self.library_table.heading('postid', text='Post ID')
+        self.library_table.heading('mobile', text='Mobile Number')
+        self.library_table.heading('bookid', text='Book ID')
+        self.library_table.heading('booktitle', text='Book Title')
+        self.library_table.heading('author', text='Author')
+        self.library_table.heading('dateborrowed', text='Date Borrowed')
+        self.library_table.heading('datedue', text='Date Due')
+        self.library_table.heading('days', text='Days On Book')
+        self.library_table.heading('latereturnfine', text='Late Return Fine')
+        self.library_table.heading('dateoverdue', text='Date Overdue')
+        self.library_table.heading('finalprice', text='Final Price')
+
+        self.library_table['show'] = 'headings'
+        self.library_table.pack(fill=BOTH, expand=1)
+
+
+
+if __name__ == '__main__':
+    root = Tk()
+    obj = LibraryManagementSystem(root)
+    root.mainloop()
+
+
+
+
+# =========================== 43:58 =========================== #
