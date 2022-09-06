@@ -10,10 +10,21 @@ from winreg import QueryInfoKey
 from numpy import pad
 from pyparsing import col
 
-import mysql.connector
+import pypyodbc as obdc
 from tkinter import messagebox
 import datetime
 import tkinter
+
+DRIVER_NAME = 'SQL SERVER'
+SERVER_NAME = 'DESKTOP-GOJTSQ5\SQLEXPRESS'
+DATABASE_NAME = 'v_library'
+
+connection_string = f"""
+    DRIVER={DRIVER_NAME};
+    SERVER={SERVER_NAME};
+    DATABASE={DATABASE_NAME};
+    Trust_Connection=yes;
+"""
 
 
 class LibraryManagementSystem:
@@ -284,9 +295,9 @@ class LibraryManagementSystem:
         self.library_table.bind("<ButtonRelease-1>", self.get_cursor)
 
     def adda_data(self):        
-        conn = mysql.connector(host='localhost', username='root', password='Test@123', database='Mydata')
-        my_cursor = conn.cursor
-        my_cursor.execute('insert into library values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (
+        conn = obdc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute('insert into library values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (
                                                                                                                 self.member_var.get(),
                                                                                                                 self.prn_var.get(),
                                                                                                                 self.id_var.get(),
@@ -313,22 +324,22 @@ class LibraryManagementSystem:
         messagebox.showinfo('Success', 'Member has been successfully Updated')
 
     def update(self):
-        conn = mysql.connector(host='localhost', username='root', password='Test@123', database='Mydata')
-        my_cursor = conn.cursor
-        my_cursor.execute('update library set Member=%s, ID=%s, FirstName=%s, LastName=%s, Address1=%s, Address2=%s, PostId=%s, Mobile=%s, Bookid=%s, Booktitle=%s, Author=%s, dateborrowed=%s, datedue=%s, daysonbook=%s, latereturnfine=%s, dateoverdue=%s, finalprice=%s where PRN_NO=%s')
+        conn = obdc.connect(connection_string)
+        cursor = conn.cursor
+        cursor.execute('update library set Member=%s, ID=%s, FirstName=%s, LastName=%s, Address1=%s, Address2=%s, PostId=%s, Mobile=%s, Bookid=%s, Booktitle=%s, Author=%s, dateborrowed=%s, datedue=%s, daysonbook=%s, latereturnfine=%s, dateoverdue=%s, finalprice=%s where PRN_NO=%s')
 
     def fetch_data(self):
-        conn = mysql.connector.connect(host='localhost', username='root', password='Test@123', database='mydata')
-        my_cursor = conn.cursor()
-        my_cursor.execute('select * from library')
-        rows = my_cursor.fetchall()
+        conn = obdc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute('select top (1) * from mylibrary')
+        rows = cursor.fetchall()
 
         if len(rows) != 0:
-            self.library_table.delete(*self.library_table.get_children)
+            self.library_table.delete(*self.library_table.get_children())
             for i in rows:
                 self.library_table.insert('', END, values=i)
             conn.commit()
-        conn.close
+        conn.close()
 
     def get_cursor(self, event=""):
         cursor_row = self.library_table.focus()
@@ -404,8 +415,8 @@ class LibraryManagementSystem:
         if self.prn_var.get() == '' or self.id_var.get() == '':
             messagebox.showerror('Error', 'First select the Member')
         else:
-            conn = mysql.connector(host='localhost', username='root', password='Test@123', database='Mydata')
-            my_cursor = conn.cursor
+            conn = obdc.connector(connection_string)
+            cursor = conn.cursor
             query = 'delete from library where PRN_No=%s'
             value = (self.prn_var.get())
 
